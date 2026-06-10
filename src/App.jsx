@@ -17,21 +17,25 @@ const GROUPS = {
   L:["England","Panama","Croatia","Ghana"],
 };
 
-const FLAGS = {
-  Mexico:"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czech Republic":"🇨🇿",
-  Canada:"🇨🇦","Bosnia & Herzegovina":"🇧🇦",Qatar:"🇶🇦",Switzerland:"🇨🇭",
-  Brazil:"🇧🇷",Morocco:"🇲🇦",Haiti:"🇭🇹",Scotland:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
-  USA:"🇺🇸",Paraguay:"🇵🇾",Turkey:"🇹🇷",Australia:"🇦🇺",
-  Germany:"🇩🇪","Ivory Coast":"🇨🇮","Curaçao":"🇨🇼",Ecuador:"🇪🇨",
-  Japan:"🇯🇵",Tunisia:"🇹🇳",Netherlands:"🇳🇱",Sweden:"🇸🇪",
-  Belgium:"🇧🇪",Iran:"🇮🇷",Egypt:"🇪🇬","New Zealand":"🇳🇿",
-  Spain:"🇪🇸","Cape Verde":"🇨🇻","Saudi Arabia":"🇸🇦",Uruguay:"🇺🇾",
-  France:"🇫🇷",Norway:"🇳🇴",Iraq:"🇮🇶",Senegal:"🇸🇳",
-  Argentina:"🇦🇷",Algeria:"🇩🇿",Jordan:"🇯🇴",Austria:"🇦🇹",
-  Portugal:"🇵🇹",Colombia:"🇨🇴",Uzbekistan:"🇺🇿","DR Congo":"🇨🇩",
-  England:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",Panama:"🇵🇦",Croatia:"🇭🇷",Ghana:"🇬🇭",
+const FLAG_CODES = {
+  Mexico:"mx","South Africa":"za","South Korea":"kr","Czech Republic":"cz",
+  Canada:"ca","Bosnia & Herzegovina":"ba",Qatar:"qa",Switzerland:"ch",
+  Brazil:"br",Morocco:"ma",Haiti:"ht",Scotland:"gb-sct",
+  USA:"us",Paraguay:"py",Turkey:"tr",Australia:"au",
+  Germany:"de","Ivory Coast":"ci","Curaçao":"cw",Ecuador:"ec",
+  Japan:"jp",Tunisia:"tn",Netherlands:"nl",Sweden:"se",
+  Belgium:"be",Iran:"ir",Egypt:"eg","New Zealand":"nz",
+  Spain:"es","Cape Verde":"cv","Saudi Arabia":"sa",Uruguay:"uy",
+  France:"fr",Norway:"no",Iraq:"iq",Senegal:"sn",
+  Argentina:"ar",Algeria:"dz",Jordan:"jo",Austria:"at",
+  Portugal:"pt",Colombia:"co",Uzbekistan:"uz","DR Congo":"cd",
+  England:"gb-eng",Panama:"pa",Croatia:"hr",Ghana:"gh",
 };
-const fl = t => FLAGS[t] || "🏳️";
+const FlagIcon = ({ t, size=20 }) => {
+  const code = FLAG_CODES[t];
+  if (!code) return <span style={{display:"inline-block",width:size,height:Math.round(size*0.75),background:"#3A5A48",borderRadius:2,flexShrink:0,verticalAlign:"middle"}}/>;
+  return <img src={`https://flagcdn.com/w40/${code}.png`} width={size} height={Math.round(size*0.75)} alt={t} style={{display:"inline-block",verticalAlign:"middle",borderRadius:2,objectFit:"cover",flexShrink:0}}/>;
+};
 
 // ─── BRACKET STRUCTURE ────────────────────────────────────────────────────────
 // Each side (A=SF1, B=SF2) has: 8 R32 → 4 R16 → 2 QF → 1 SF
@@ -370,7 +374,7 @@ function MatchCard({ matchId, label, subLabel, teams, winner, onPick, registerRe
 
     if (!team) return (
       <div className="bkt-team tbd">
-        <span className="bkt-flag">🏳️</span>
+        <FlagIcon t={null} size={15}/>
         <span className="bkt-name" style={{fontStyle:"normal",color:T.dim,fontSize:11}}>{slot || "TBD"}</span>
         {is3 && <span className="bkt-3rd">3rd</span>}
       </div>
@@ -380,7 +384,7 @@ function MatchCard({ matchId, label, subLabel, teams, winner, onPick, registerRe
         className={`bkt-team${canPick ? " clickable" : ""}${isW ? " winner" : isL ? " loser" : ""}`}
         onClick={() => canPick && onPick(matchId, team)}
       >
-        <span className="bkt-flag">{fl(team)}</span>
+        <FlagIcon t={team} size={15}/>
         <span className="bkt-name">{team}</span>
         {is3 && <span className="bkt-3rd">3rd</span>}
         {isW && <span className="bkt-check">✓</span>}
@@ -621,7 +625,7 @@ function FinalCard({ teams, winner, onPick }) {
     const isL = winner && !isW;
     if (!team) return (
       <div className="final-team-row tbd">
-        <span style={{fontSize:26}}>🏳️</span>
+        <FlagIcon t={null} size={26}/>
         <span style={{fontSize:16}}>TBD — complete semi-finals</span>
       </div>
     );
@@ -630,7 +634,7 @@ function FinalCard({ teams, winner, onPick }) {
         className={`final-team-row${isW?" winner":isL?" loser":""}`}
         onClick={() => canPick && onPick("final", team)}
       >
-        <span style={{fontSize:28}}>{fl(team)}</span>
+        <FlagIcon t={team} size={28}/>
         <span style={{flex:1,fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:700,letterSpacing:".04em"}}>{team}</span>
         {isW && <span style={{fontSize:20}}>🏆</span>}
         {!winner && canPick && <span style={{fontSize:11,color:T.slate,border:`1px solid ${T.border}`,padding:"2px 8px",borderRadius:4}}>Pick winner</span>}
@@ -655,7 +659,7 @@ function FinalCard({ teams, winner, onPick }) {
         <div style={{height:1,background:T.border}}/>
         <Row team={t2} />
       </div>
-      {winner && <div style={{textAlign:"center",marginTop:12,fontSize:14,color:T.gold,fontWeight:700}}>{fl(winner)} {winner} wins the 2026 World Cup!</div>}
+      {winner && <div style={{textAlign:"center",marginTop:12,fontSize:14,color:T.gold,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}><FlagIcon t={winner} size={18}/> {winner} wins the 2026 World Cup!</div>}
     </div>
   );
 }
@@ -710,7 +714,7 @@ function PredictTab({ onSubmit }) {
       <div className="trophy-anim" style={{fontSize:64,marginBottom:14}}>🏆</div>
       <div className="section-title">BRACKET LOCKED IN!</div>
       <div style={{color:T.slate,marginTop:8,fontSize:14}}>Saved for <strong style={{color:T.white}}>{name}</strong> · Drop the link in Discord!</div>
-      {winners.final && <div style={{marginTop:8,fontSize:14,color:T.gold}}>{fl(winners.final)} {winners.final} wins it all!</div>}
+      {winners.final && <div style={{marginTop:8,fontSize:14,color:T.gold,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}><FlagIcon t={winners.final} size={16}/> {winners.final} wins it all!</div>}
       <button className="btn-ghost" style={{marginTop:22}} onClick={() => { setSubmitted(false); setStep(0); }}>Edit Bracket</button>
     </div>
   );
@@ -765,7 +769,7 @@ function PredictTab({ onSubmit }) {
                     {[0,1].map(idx => (
                       <div key={idx} style={{padding:"5px 8px",background:picks[idx]?T.goldGlow:T.base,border:`1px solid ${picks[idx]?T.goldDim:T.dim}`,borderRadius:6,minHeight:30,display:"flex",alignItems:"center",gap:5}}>
                         <span style={{fontSize:9,color:idx===0?T.gold:T.slate,fontWeight:700,flexShrink:0}}>{idx===0?"1ST":"2ND"}</span>
-                        {picks[idx] ? <><span style={{fontSize:14}}>{fl(picks[idx])}</span><span style={{fontSize:11,color:T.gold,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{picks[idx]}</span></> : <span style={{fontSize:11,color:T.dim}}>—</span>}
+                        {picks[idx] ? <><FlagIcon t={picks[idx]} size={16}/><span style={{fontSize:11,color:T.gold,fontWeight:600,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{picks[idx]}</span></> : <span style={{fontSize:11,color:T.dim}}>—</span>}
                       </div>
                     ))}
                   </div>
@@ -774,7 +778,7 @@ function PredictTab({ onSubmit }) {
                     return (
                       <div key={t} className="team-row">
                         <div style={{display:"flex",alignItems:"center",gap:6}}>
-                          <span style={{fontSize:16}}>{fl(t)}</span>
+                          <FlagIcon t={t} size={18}/>
                           <span style={{fontSize:13,color:sel?T.white:T.slate,fontWeight:sel?600:400}}>{t}</span>
                           {sel && <span style={{fontSize:9,background:T.goldGlow,border:`1px solid ${T.goldDim}`,color:T.gold,padding:"1px 5px",borderRadius:3,fontWeight:700}}>{pos===0?"1ST":"2ND"}</span>}
                         </div>
@@ -811,7 +815,7 @@ function PredictTab({ onSubmit }) {
                   {thirds.length===0 ? <div style={{fontSize:11,color:T.dim}}>Set Group {grp} picks first</div> :
                   thirds.map(t => (
                     <div key={t} className="team-row">
-                      <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:16}}>{fl(t)}</span><span style={{fontSize:13,color:thirdPicks.includes(t)?T.white:T.slate}}>{t}</span></div>
+                      <div style={{display:"flex",alignItems:"center",gap:6}}><FlagIcon t={t} size={18}/><span style={{fontSize:13,color:thirdPicks.includes(t)?T.white:T.slate}}>{t}</span></div>
                       <button className={`pick-btn${thirdPicks.includes(t)?" third":""}`} onClick={()=>toggleThird(t)} disabled={!thirdPicks.includes(t)&&thirdPicks.length>=8}>{thirdPicks.includes(t)?"✓ In":"Pick"}</button>
                     </div>
                   ))}
@@ -871,10 +875,10 @@ function PredictTab({ onSubmit }) {
             <div>
               <div className="lbl">🏆 Champion</div>
               <div style={{fontSize:18,display:"flex",alignItems:"center",gap:7}}>
-                {winners.final ? <><span style={{fontSize:24}}>{fl(winners.final)}</span><span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:700,color:T.gold}}>{winners.final}</span></> : "—"}
+                {winners.final ? <><FlagIcon t={winners.final} size={24}/><span style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,fontWeight:700,color:T.gold}}>{winners.final}</span></> : "—"}
               </div>
               <div style={{fontSize:12,color:T.slate,marginTop:2}}>
-                Finalist: {(() => { const other = winners.final===winners.sf1?winners.sf2:winners.sf1; return other?`${fl(other)} ${other}`:"—"; })()}
+                Finalist: {(() => { const other = winners.final===winners.sf1?winners.sf2:winners.sf1; return other?<span style={{display:"inline-flex",alignItems:"center",gap:4}}><FlagIcon t={other} size={14}/>{other}</span>:"—"; })()}
               </div>
             </div>
           </div>
@@ -883,13 +887,13 @@ function PredictTab({ onSubmit }) {
             {Object.entries(gPicks).map(([g,ts]) => (
               <div key={g} style={{padding:"7px 10px",background:T.raised,borderRadius:6,fontSize:12,color:T.slate}}>
                 <span style={{color:T.gold,fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif",fontSize:14}}>GRP {g} </span>
-                {ts.map((t,i)=>`${i+1}. ${fl(t)} ${t}`).join("  ·  ")}
+                {ts.map((t,i)=><span key={t}>{i>0?" · ":""}{i+1}. <FlagIcon t={t} size={13}/> {t}</span>)}
               </div>
             ))}
           </div>
           <div className="lbl">3rd place advancing ({thirdPicks.length})</div>
           <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:20,marginTop:8}}>
-            {thirdPicks.map(t => <span key={t} style={{padding:"3px 10px",background:"#25A24418",border:"1px solid #25A24444",borderRadius:20,fontSize:12,color:T.green}}>{fl(t)} {t}</span>)}
+            {thirdPicks.map(t => <span key={t} style={{padding:"3px 10px",background:"#25A24418",border:"1px solid #25A24444",borderRadius:20,fontSize:12,color:T.green,display:"inline-flex",alignItems:"center",gap:5}}><FlagIcon t={t} size={14}/>{t}</span>)}
           </div>
           <div style={{display:"flex",gap:12}}>
             <button className="btn-ghost" onClick={()=>setStep(3)}>← Edit Bracket</button>
@@ -929,7 +933,7 @@ function LeaderboardTab({ entries, onRefresh }) {
                 <div style={{flex:1}}><div style={{fontSize:14,fontWeight:700}}>{e.name}</div><div style={{fontSize:11,color:T.slate}}>{e.email}</div></div>
                 <div style={{textAlign:"center"}}><div style={{fontFamily:"'Barlow Condensed',sans-serif",fontSize:22,color:T.gold,lineHeight:1}}>{e.score}</div><div style={{fontSize:10,color:T.slate}}>pts</div></div>
                 <div style={{textAlign:"center",fontSize:13,color:T.slate,fontWeight:600}}>{e.correctPicks||0}</div>
-                <div style={{fontSize:13}}>{e.winners?.final?`${fl(e.winners.final)} ${e.winners.final}`:"—"}</div>
+                <div style={{fontSize:13,display:"flex",alignItems:"center",gap:5}}>{e.winners?.final?<><FlagIcon t={e.winners.final} size={16}/>{e.winners.final}</>:"—"}</div>
               </div>
             ))}
           </>
@@ -1005,7 +1009,7 @@ function GroupsTab() {
             </div>
             {ts.map((t,i)=>(
               <div key={t} style={{display:"flex",alignItems:"center",gap:8,padding:"6px 0",borderBottom:i<ts.length-1?`1px solid ${T.border}`:"none"}}>
-                <span style={{fontSize:18}}>{fl(t)}</span>
+                <FlagIcon t={t} size={20}/>
                 <span style={{fontSize:13,flex:1}}>{t}</span>
               </div>
             ))}
@@ -1040,13 +1044,13 @@ function LiveTab() {
   const today=FIXTURES.filter(isToday), recent=FIXTURES.filter(isPast).slice(-6).reverse(), coming=FIXTURES.filter(m=>dOf(m)>now).slice(0,12);
   const MRow=({m,live})=>(
     <div className="fixture-row">
-      <div style={{flex:1,display:"flex",alignItems:"center",gap:7}}><span style={{fontSize:19}}>{fl(m.t1)}</span><span style={{fontSize:13,fontWeight:600}}>{m.t1}</span></div>
+      <div style={{flex:1,display:"flex",alignItems:"center",gap:7}}><FlagIcon t={m.t1} size={22}/><span style={{fontSize:13,fontWeight:600}}>{m.t1}</span></div>
       <div style={{textAlign:"center",minWidth:56}}>
         {live&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:4,marginBottom:1}}><span className="live-dot"/><span style={{fontSize:9,color:T.red,fontWeight:700}}>LIVE</span></div>}
         <div className="fixture-score">{isPast(m)||live?"— : —":"vs"}</div>
         <div style={{fontSize:10,color:T.slate,marginTop:1}}>{m.venue}</div>
       </div>
-      <div style={{flex:1,display:"flex",alignItems:"center",gap:7,justifyContent:"flex-end"}}><span style={{fontSize:13,fontWeight:600}}>{m.t2}</span><span style={{fontSize:19}}>{fl(m.t2)}</span></div>
+      <div style={{flex:1,display:"flex",alignItems:"center",gap:7,justifyContent:"flex-end"}}><span style={{fontSize:13,fontWeight:600}}>{m.t2}</span><FlagIcon t={m.t2} size={22}/></div>
       <div style={{width:"100%",display:"flex",justifyContent:"space-between",paddingTop:3}}>
         <span style={{fontSize:11,color:T.dim}}>Group {m.grp}</span>
         <span style={{fontSize:11,color:T.dim}}>{new Date(m.date).toLocaleDateString([],{month:"short",day:"numeric"})}</span>
