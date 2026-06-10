@@ -102,16 +102,6 @@ async function saveEntries(entry) {
   return dbSaveEntry(entry)
 }
 
-// ─── AI ───────────────────────────────────────────────────────────────────────
-async function askClaude(system, user) {
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system,messages:[{role:"user",content:user}]})
-    });
-    return (await r.json()).content?.[0]?.text || "No response.";
-  } catch { return "AI unavailable right now."; }
-}
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const T = {
@@ -679,8 +669,6 @@ function PredictTab({ onSubmit }) {
   const [gPicks,setGPicks] = useState({});
   const [thirdPicks,setThirdPicks] = useState([]);
   const [submitted,setSubmitted] = useState(false);
-  const [aiTip,setAiTip] = useState(""); const [aiLoading,setAiLoading] = useState(false); const [aiLabel,setAiLabel] = useState("");
-  const [winTip,setWinTip] = useState(""); const [winLoading,setWinLoading] = useState(false);
 
   const { winners, getTeams, pickWinner, finalDone } = useBracket(gPicks, thirdPicks);
 
@@ -702,16 +690,6 @@ function PredictTab({ onSubmit }) {
     );
   };
 
-  const fetchGroupTip = async (grp) => {
-    setAiLabel(`Group ${grp}`); setAiTip(""); setAiLoading(true);
-    const tip = await askClaude("Sharp WC2026 analyst. 2 punchy sentences: who finishes 1st and 2nd. Be confident.", `Group ${grp}: ${GROUPS[grp].join(", ")}. Top 2?`);
-    setAiTip(tip); setAiLoading(false);
-  };
-  const fetchWinnerTip = async () => {
-    setWinLoading(true); setWinTip("");
-    const tip = await askClaude("Bold WC2026 predictor. One winner. 3 sentences max. Decisive and fun.", "Who wins the 2026 FIFA World Cup?");
-    setWinTip(tip); setWinLoading(false);
-  };
 
   const doSubmit = async () => {
     const entry = { id:Date.now(), name:name.trim(), email:email.trim(), submittedAt:new Date().toISOString(), gPicks, thirdPicks, winners, score:0, correctPicks:0 };
@@ -773,13 +751,6 @@ function PredictTab({ onSubmit }) {
               </div>
               <div style={{fontSize:13,color:groupsDone?T.green:T.slate,fontWeight:700,flexShrink:0}}>{groupCount}/12</div>
             </div>
-            {(aiTip||aiLoading) && (
-              <div style={{marginTop:12,padding:12,background:T.base,border:`1px solid ${T.gold}28`,borderRadius:10}}>
-                <div style={{fontSize:11,color:T.gold,fontWeight:700,letterSpacing:".1em",marginBottom:6}}>🤖 AI · {aiLabel.toUpperCase()}</div>
-                {aiLoading ? <div style={{display:"flex",gap:9,alignItems:"center",color:T.slate,fontSize:13}}><span className="spin-anim"/>Analyzing...</div>
-                : <div style={{fontSize:13,color:T.white,lineHeight:1.65}}>{aiTip}</div>}
-              </div>
-            )}
           </div>
           <div className="grid-2">
             {Object.entries(GROUPS).map(([grp,teams]) => {
@@ -813,7 +784,6 @@ function PredictTab({ onSubmit }) {
                       </div>
                     );
                   })}
-                  <button onClick={()=>fetchGroupTip(grp)} style={{marginTop:10,width:"100%",padding:"6px",background:"transparent",border:`1px solid ${T.gold}22`,borderRadius:6,color:T.gold,fontSize:11,fontWeight:700,letterSpacing:".07em",cursor:"pointer"}}>🤖 AI INSIGHT</button>
                 </div>
               );
             })}
@@ -865,11 +835,7 @@ function PredictTab({ onSubmit }) {
                 <div className="section-title">KNOCKOUT BRACKET</div>
                 <div style={{fontSize:13,color:T.slate,marginTop:4}}>Click any team to pick the winner — they advance automatically through each round. Lines turn gold as teams progress.</div>
               </div>
-              <button onClick={fetchWinnerTip} disabled={winLoading} style={{padding:"8px 14px",background:T.raised,border:`1px solid ${T.gold}33`,borderRadius:8,color:T.gold,fontSize:13,fontWeight:700,display:"inline-flex",alignItems:"center",gap:7,flexShrink:0}}>
-                {winLoading?<><span className="spin-anim"/>Thinking...</>:<>🤖 AI Pick</>}
-              </button>
             </div>
-            {winTip && <div style={{marginTop:12,padding:12,background:T.base,border:`1px solid ${T.gold}28`,borderRadius:8,fontSize:13,color:T.white,lineHeight:1.65}}>{winTip}</div>}
           </div>
 
           <div className="hint" style={{marginBottom:14,display:"flex",gap:16,flexWrap:"wrap"}}>
